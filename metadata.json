@@ -1,0 +1,6 @@
+{
+  "name": "Job Portal",
+  "description": "Complete full-stack job portal with authentication, profile setup, job search and filtering, applications tracking, interview scheduling, and offer status.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
