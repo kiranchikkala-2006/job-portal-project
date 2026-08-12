@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { createServer as createViteServer } from 'vite';
 import { fileURLToPath } from 'url';
 import net from 'node:net';
 
@@ -80,16 +79,8 @@ async function startServer() {
     });
   });
 
-  // Vite middleware for development vs static serve for production
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Mounting Vite middleware in development mode...');
-    const vite = await createViteServer({
-      root: frontendDir,
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
+  // Frontend is served separately during development. In production we can still serve the built app.
+  if (process.env.NODE_ENV === 'production') {
     console.log('Serving static files in production mode...');
     const distPath = path.join(frontendDir, 'dist');
     app.use(express.static(distPath));
