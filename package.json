@@ -6,6 +6,10 @@
     "build": "cd frontend && npm install && npm run build && cd ../backend && esbuild server.js --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs"
   },
   "dependencies": {
+    "esbuild": "^0.28.2",
     "mongoose": "^8.9.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }
