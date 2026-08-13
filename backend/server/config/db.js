@@ -1,5 +1,8 @@
+import dns from 'dns';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 let mongoMemoryServer = null;
 
@@ -19,12 +22,13 @@ export const connectDB = async () => {
     return conn;
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
-    // If external URI fails, try fallback memory server
+
     if (!mongoMemoryServer) {
       try {
         console.log('Attempting fallback to in-memory MongoDB server...');
         mongoMemoryServer = await MongoMemoryServer.create();
         const fallbackUri = mongoMemoryServer.getUri();
+
         const conn = await mongoose.connect(fallbackUri);
         console.log(`Fallback MongoDB Connected: ${conn.connection.host}`);
         return conn;
