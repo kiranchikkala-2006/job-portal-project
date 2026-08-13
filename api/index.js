@@ -17,23 +17,27 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/api/health', async (req, res) => {
+app.use(async (req, res, next) => {
   try {
     await connectDB();
-
-    res.json({
-      status: 'ok',
-      service: 'Job Portal API',
-      time: new Date()
-    });
+    next();
   } catch (error) {
-    console.error('Health error:', error);
+    console.error('Database connection error:', error);
 
     res.status(500).json({
       status: 'error',
-      message: error.message
+      message: 'Database connection failed',
+      error: error.message
     });
   }
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'Job Portal API',
+    time: new Date()
+  });
 });
 
 app.use('/api/auth', authRoutes);
