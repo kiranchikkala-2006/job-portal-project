@@ -1,43 +1,29 @@
-import dns from 'dns';
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 
-dns.setServers(['8.8.8.8', '1.1.1.1']);
-
-let mongoMemoryServer = null;
+let isConnected = false;
 
 export const connectDB = async () => {
+  if (isConnected && mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  const uri = process.env.MONGO_URI;
+
+  if (!uri) {
+    throw new Error('MONGO_URI environment variable is not configured');
+  }
+
   try {
-    let uri = process.env.MONGO_URI;
-
-    if (!uri || uri.trim() === '') {
-      console.log('No MONGO_URI provided. Starting in-memory MongoDB server...');
-      mongoMemoryServer = await MongoMemoryServer.create();
-      uri = mongoMemoryServer.getUri();
-      console.log(`In-memory MongoDB started at: ${uri}`);
-    }
-
     const conn = await mongoose.connect(uri);
+
+    isConnected = true;
+
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+
     return conn;
   } catch (error) {
+    isConnected = false;
     console.error(`MongoDB Connection Error: ${error.message}`);
-
-    if (!mongoMemoryServer) {
-      try {
-        console.log('Attempting fallback to in-memory MongoDB server...');
-        mongoMemoryServer = await MongoMemoryServer.create();
-        const fallbackUri = mongoMemoryServer.getUri();
-
-        const conn = await mongoose.connect(fallbackUri);
-        console.log(`Fallback MongoDB Connected: ${conn.connection.host}`);
-        return conn;
-      } catch (fallbackErr) {
-        console.error('Fallback MongoDB failed:', fallbackErr.message);
-        process.exit(1);
-      }
-    } else {
-      process.exit(1);
-    }
+    throw error;
   }
 };
