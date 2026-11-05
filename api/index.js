@@ -1,6 +1,8 @@
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 
 import { connectDB } from '../backend/server/config/db.js';
 
@@ -9,7 +11,10 @@ import userRoutes from '../backend/server/routes/userRoutes.js';
 import jobRoutes from '../backend/server/routes/jobRoutes.js';
 import applicationRoutes from '../backend/server/routes/applicationRoutes.js';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../backend/.env') });
 
 const app = express();
 
